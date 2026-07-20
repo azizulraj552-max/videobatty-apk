@@ -1,0 +1,15 @@
+{
+  "name": "videobatty-apk",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "echo 'no build step needed - remote URL mode'"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/android": "^6.1.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.2"
+  }
+}
