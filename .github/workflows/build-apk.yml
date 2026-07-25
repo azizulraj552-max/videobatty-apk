@@ -60,7 +60,8 @@ jobs:
       - name: Decode signing keystore
         shell: bash
         run: |
-          echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d > android/app/videobatty-release.keystore
+          mkdir -p android/app
+          echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 --decode > android/app/videobatty-release.keystore
 
       - name: Write keystore properties
         shell: bash
