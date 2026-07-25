@@ -26,15 +26,6 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Sync AdMob App ID into capacitor.config.json from admob-app-id.txt
-        run: |
-          APPID=$(cat admob-app-id.txt | tr -d '[:space:]')
-          if [ -n "$APPID" ]; then
-            jq --arg id "$APPID" '.plugins.AdMob.appId = $id' capacitor.config.json > tmp.json && mv tmp.json capacitor.config.json
-            echo "AdMob App ID synced: $APPID"
-            cat capacitor.config.json
-          fi
-
       - name: Add Android platform (fresh each run - always regenerated)
         run: npx cap add android
 
@@ -49,39 +40,13 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      # ================= 🔑 সাইনিং কী ডিকোড ও যাচাই =================
-      - name: Check if SIGNING_KEYSTORE_BASE64 secret is set
-        run: |
-          if [ -z "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" ]; then
-            echo "❌ SIGNING_KEYSTORE_BASE64 secret is empty!"
-            exit 1
-          else
-            echo "✅ Secret exists, length: ${#{{ secrets.SIGNING_KEYSTORE_BASE64 }}}"
-          fi
-
+      # ================= 🔑 স্থায়ী সাইনিং কী (লগইন-হারানো বাগ ফিক্স) =================
+      # ⚠️ আগে প্রতিটা GitHub Actions রান নিজে থেকেই একটা নতুন র‍্যান্ডম debug
+      # keystore বানাতো, তাই প্রতিটা নতুন APK-কে Android আলাদা "অ্যাপ" হিসেবে
+      # ধরে নিত এবং পুরনোটার সব ডেটা (লগইন সেশন) মুছে দিত। এখন GitHub Secret-এ
+      # রাখা একটা স্থায়ী কী প্রতিবার ব্যবহার করা হয়, তাই আপডেট হলেও ডেটা থাকবে।
       - name: Decode signing keystore
-        run: |
-          echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d > android/app/videobatty-release.keystore
-          echo "Keystore decoded. Checking file size..."
-          ls -la android/app/videobatty-release.keystore
-          if [ ! -s android/app/videobatty-release.keystore ]; then
-            echo "❌ Decoded keystore file is empty! Check your secret."
-            exit 1
-          fi
-
-      - name: Verify Keystore (পাসওয়ার্ড যাচাই)
-        working-directory: android/app
-        env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        run: |
-          echo "🔑 Trying to list keystore entries..."
-          keytool -list -keystore videobatty-release.keystore -storepass $KEYSTORE_PASSWORD -v
-          if [ $? -eq 0 ]; then
-            echo "✅ Keystore validated successfully!"
-          else
-            echo "❌ Keystore validation failed. Check password or file."
-            exit 1
-          fi
+        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d > android/app/videobatty-release.keystore
 
       - name: Configure signing in build.gradle
         run: |
@@ -94,7 +59,6 @@ jobs:
                       storePassword System.getenv("KEYSTORE_PASSWORD")
                       keyAlias "videobatty"
                       keyPassword System.getenv("KEYSTORE_PASSWORD")
-                      storeType 'PKCS12'
                   }
               }
               buildTypes {
