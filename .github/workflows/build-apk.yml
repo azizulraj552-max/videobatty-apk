@@ -33,11 +33,12 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      # 🔐 Decode keystore from GitHub Secrets
+      # 🔐 Decode keystore (FIXED VERSION)
       - name: Decode keystore
-        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+        run: |
+          echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 --decode > android/app/release.keystore
 
-      # 🔐 Configure signing (FIXED)
+      # 🔐 Configure signing (CLEAN)
       - name: Configure signing
         run: |
           cat >> android/app/build.gradle << 'EOF'
