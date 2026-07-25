@@ -3,11 +3,12 @@ name: Build Signed Android APK
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,46 +21,34 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Setup JDK
+      - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Add Android platform (fresh each run - always regenerated)
+      - name: Add Android platform
         run: npx cap add android
-
-      - name: Ensure AdMob App ID is in AndroidManifest.xml
-        run: |
-          MANIFEST="android/app/src/main/AndroidManifest.xml"
-          APPID=$(cat admob-app-id.txt | tr -d '[:space:]')
-          if [ -n "$APPID" ] && ! grep -q "APPLICATION_ID" "$MANIFEST"; then
-            sed -i "s#</application>#    <meta-data android:name=\"com.google.android.gms.ads.APPLICATION_ID\" android:value=\"$APPID\"/>\n</application>#" "$MANIFEST"
-          fi
 
       - name: Sync Capacitor
         run: npx cap sync android
 
-      # ================= 🔑 স্থায়ী সাইনিং কী (লগইন-হারানো বাগ ফিক্স) =================
-      # ⚠️ আগে প্রতিটা GitHub Actions রান নিজে থেকেই একটা নতুন র‍্যান্ডম debug
-      # keystore বানাতো, তাই প্রতিটা নতুন APK-কে Android আলাদা "অ্যাপ" হিসেবে
-      # ধরে নিত এবং পুরনোটার সব ডেটা (লগইন সেশন) মুছে দিত। এখন GitHub Secret-এ
-      # রাখা একটা স্থায়ী কী প্রতিবার ব্যবহার করা হয়, তাই আপডেট হলেও ডেটা থাকবে।
-      - name: Decode signing keystore
-        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d > android/app/videobatty-release.keystore
+      # 🔐 Decode keystore from GitHub Secrets
+      - name: Decode keystore
+        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
 
-      - name: Configure signing in build.gradle
+      # 🔐 Configure signing (FIXED)
+      - name: Configure signing
         run: |
           cat >> android/app/build.gradle << 'EOF'
 
           android {
               signingConfigs {
                   release {
-                      storeFile file("videobatty-release.keystore")
+                      storeFile file("release.keystore")
                       storePassword System.getenv("KEYSTORE_PASSWORD")
                       keyAlias "videobatty"
                       keyPassword System.getenv("KEYSTORE_PASSWORD")
-                      storeType 'PKCS12'
                   }
               }
               buildTypes {
@@ -73,7 +62,7 @@ jobs:
           }
           EOF
 
-      - name: Build Signed APK (debug variant - direct install/share)
+      - name: Build Debug APK
         working-directory: android
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -81,7 +70,7 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Build Signed Release APK + AAB (Play Store-ready)
+      - name: Build Release APK + AAB
         working-directory: android
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -89,20 +78,20 @@ jobs:
           ./gradlew assembleRelease
           ./gradlew bundleRelease
 
-      - name: Upload debug APK (share directly with users)
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: videobatty-debug-apk
+          name: debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
 
-      - name: Upload release APK
+      - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: videobatty-release-apk
+          name: release-apk
           path: android/app/build/outputs/apk/release/app-release.apk
 
-      - name: Upload release AAB (Play Store upload করতে এটা লাগবে)
+      - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
-          name: videobatty-release-aab
+          name: release-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
