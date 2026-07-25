@@ -68,6 +68,7 @@ jobs:
                       storePassword System.getenv("KEYSTORE_PASSWORD")
                       keyAlias "videobatty"
                       keyPassword System.getenv("KEYSTORE_PASSWORD")
+                      storeType 'PKCS12'
                   }
               }
               buildTypes {
