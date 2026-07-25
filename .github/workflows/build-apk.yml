@@ -49,19 +49,25 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      # ================= 🔑 স্থায়ী সাইনিং কী (লগইন-হারানো বাগ ফিক্স) =================
+      # ================= 🔑 সাইনিং কী ডিকোড ও যাচাই =================
       - name: Decode signing keystore
         run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d > android/app/videobatty-release.keystore
 
-      # ✅ নতুন ডায়াগনস্টিক স্টেপ (Keystore ঠিক আছে কিনা যাচাই করবে)
-      - name: Verify Keystore (পাসওয়ার্ড ও ফাইল ঠিক আছে কিনা চেক করুন)
+      - name: Verify Keystore (ফাইল ও পাসওয়ার্ড চেক)
         working-directory: android/app
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
-          echo "🔍 Keystore ভেরিফাই করা হচ্ছে..."
-          keytool -list -v -keystore videobatty-release.keystore -storepass $KEYSTORE_PASSWORD -storetype PKCS12
-          echo "✅ Keystore সঠিকভাবে লোড হয়েছে!"
+          echo "📁 Keystore ফাইল আছে কিনা দেখি:"
+          ls -la videobatty-release.keystore || { echo "❌ ফাইল পাওয়া যায়নি!"; exit 1; }
+          echo "🔑 Keystore এর এন্ট্রি লিস্ট করতে চেষ্টা করছি..."
+          keytool -list -keystore videobatty-release.keystore -storepass $KEYSTORE_PASSWORD -storetype PKCS12 -v
+          if [ $? -eq 0 ]; then
+            echo "✅ Keystore সঠিকভাবে লোড হয়েছে!"
+          else
+            echo "❌ Keystore যাচাই করতে ব্যর্থ! পাসওয়ার্ড অথবা ফাইল করাপ্ট।"
+            exit 1
+          fi
 
       - name: Configure signing in build.gradle
         run: |
