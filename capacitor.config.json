@@ -13,7 +13,7 @@
   },
   "plugins": {
     "AdMob": {
-      "appId": "PASTE_YOUR_ADMOB_APP_ID_HERE_FORMAT_ca-app-pub-XXXX~YYYY"
+      "appId": "ca-app-pub-3036349500013592~4085923502"
     }
   }
 }
