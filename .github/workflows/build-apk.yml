@@ -31,19 +31,23 @@ jobs:
       - name: Sync AdMob App ID into capacitor.config.json
         shell: bash
         run: |
-          APPID="$(tr -d '[:space:]' < admob-app-id.txt)"
-          if [ -n "$APPID" ]; then
-            jq --arg id "$APPID" '.plugins.AdMob.appId = $id' capacitor.config.json > tmp.json && mv tmp.json capacitor.config.json
+          if [ -f admob-app-id.txt ]; then
+            APPID="$(tr -d '[:space:]' < admob-app-id.txt)"
+            if [ -n "$APPID" ]; then
+              jq --arg id "$APPID" '.plugins.AdMob.appId = $id' capacitor.config.json > tmp.json && mv tmp.json capacitor.config.json
+            fi
           fi
 
       - name: Ensure AdMob App ID is in AndroidManifest.xml
         shell: bash
         run: |
           MANIFEST="android/app/src/main/AndroidManifest.xml"
-          APPID="$(tr -d '[:space:]' < admob-app-id.txt)"
-          if [ -n "$APPID" ] && ! grep -q "com.google.android.gms.ads.APPLICATION_ID" "$MANIFEST"; then
-            sed -i "s#</application>#    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="$APPID"/>
+          if [ -f admob-app-id.txt ] && [ -f "$MANIFEST" ]; then
+            APPID="$(tr -d '[:space:]' < admob-app-id.txt)"
+            if [ -n "$APPID" ] && ! grep -q "com.google.android.gms.ads.APPLICATION_ID" "$MANIFEST"; then
+              sed -i "s#</application>#    <meta-data android:name="com.google.android.gms.ads.APPLICATION_ID" android:value="$APPID"/>
 </application>#" "$MANIFEST"
+            fi
           fi
 
       - name: Sync Capacitor
@@ -54,50 +58,21 @@ jobs:
         run: |
           echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d > android/app/videobatty-release.keystore
 
-      - name: Create gradle properties
+      - name: Write keystore properties
         shell: bash
         run: |
-          cat > android/gradle.properties <<EOF
-          MYAPP_RELEASE_STORE_FILE=videobatty-release.keystore
-          MYAPP_RELEASE_KEY_ALIAS=videobatty
-          MYAPP_RELEASE_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}
-          MYAPP_RELEASE_KEY_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}
+          cat > android/keystore.properties <<EOF
+          storeFile=app/videobatty-release.keystore
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyAlias=videobatty
+          keyPassword=${{ secrets.KEYSTORE_PASSWORD }}
           EOF
 
-      - name: Update android app build.gradle signing config
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path("android/app/build.gradle")
-          s = p.read_text()
-          if "signingConfigs" not in s:
-              s = s.replace(
-                  "android {",
-                  """android {
-              signingConfigs {
-                  release {
-                      storeFile file(MYAPP_RELEASE_STORE_FILE)
-                      storePassword MYAPP_RELEASE_STORE_PASSWORD
-                      keyAlias MYAPP_RELEASE_KEY_ALIAS
-                      keyPassword MYAPP_RELEASE_KEY_PASSWORD
-                  }
-              }"""
-              )
-          if "signingConfig signingConfigs.release" not in s:
-              s = s.replace(
-                  "release {",
-                  """release {
-                      signingConfig signingConfigs.release"""
-              )
-          p.write_text(s)
-          PY
-
-      - name: Build Signed Release APK and AAB
+      - name: Build signed release APK and AAB
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleRelease bundleRelease
+          ./gradlew clean assembleRelease bundleRelease
 
       - name: Upload release APK
         uses: actions/upload-artifact@v4
