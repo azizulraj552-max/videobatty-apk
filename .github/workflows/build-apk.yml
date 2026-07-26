@@ -8,7 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -18,66 +17,91 @@ jobs:
         with:
           node-version: 20
 
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
       - name: Install dependencies
         run: npm install
 
-      - name: Add Android Platform if missing
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Sync AdMob App ID into capacitor.config.json from admob-app-id.txt
         run: |
-          if [ ! -d "android" ]; then
-            npx cap add android
+          APPID=$(cat admob-app-id.txt | tr -d '[:space:]')
+          if [ -n "$APPID" ]; then
+            jq --arg id "$APPID" '.plugins.AdMob.appId = $id' capacitor.config.json > tmp.json && mv tmp.json capacitor.config.json
+            echo "AdMob App ID synced: $APPID"
+            cat capacitor.config.json
           fi
 
-      - name: Sync AdMob App ID into capacitor.config.json
-        shell: bash
+      - name: Add Android platform (fresh each run - always regenerated)
+        run: npx cap add android
+
+      - name: Ensure AdMob App ID is in AndroidManifest.xml
         run: |
-          if [ -f admob-app-id.txt ]; then
-            APPID="$(tr -d '[:space:]' < admob-app-id.txt)"
-            if [ -n "$APPID" ]; then
-              jq --arg id "$APPID" '.plugins.AdMob.appId = $id' capacitor.config.json > tmp.json && mv tmp.json capacitor.config.json
-            fi
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          APPID=$(cat admob-app-id.txt | tr -d '[:space:]')
+          if [ -n "$APPID" ] && ! grep -q "APPLICATION_ID" "$MANIFEST"; then
+            sed -i "s#</application>#    <meta-data android:name=\"com.google.android.gms.ads.APPLICATION_ID\" android:value=\"$APPID\"/>\n</application>#" "$MANIFEST"
           fi
 
       - name: Sync Capacitor
         run: npx cap sync android
 
-      - name: Ensure AdMob App ID is in AndroidManifest.xml
-        shell: bash
-        run: |
-          MANIFEST="android/app/src/main/AndroidManifest.xml"
-          if [ -f admob-app-id.txt ] && [ -f "$MANIFEST" ]; then
-            APPID="$(tr -d '[:space:]' < admob-app-id.txt)"
-            if [ -n "$APPID" ] && ! grep -q "com.google.android.gms.ads.APPLICATION_ID" "$MANIFEST"; then
-              sed -i "s#</application>#    <meta-data android:name=\"com.google.android.gms.ads.APPLICATION_ID\" android:value=\"$APPID\"/>\n</application>#" "$MANIFEST"
-            fi
-          fi
-
+      # ================= 🔑 স্থায়ী সাইনিং কী (লগইন-হারানো বাগ ফিক্স) =================
+      # ⚠️ আগে প্রতিটা GitHub Actions রান নিজে থেকেই একটা নতুন র‍্যান্ডম debug
+      # keystore বানাতো, তাই প্রতিটা নতুন APK-কে Android আলাদা "অ্যাপ" হিসেবে
+      # ধরে নিত এবং পুরনোটার সব ডেটা (লগইন সেশন) মুছে দিত। এখন GitHub Secret-এ
+      # রাখা একটা স্থায়ী কী প্রতিবার ব্যবহার করা হয়, তাই আপডেট হলেও ডেটা থাকবে।
       - name: Decode signing keystore
-        shell: bash
-        run: |
-          mkdir -p android/app
-          echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 --decode > android/app/videobatty-release.keystore
+        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d > android/app/videobatty-release.keystore
 
-      - name: Write keystore properties
-        shell: bash
+      - name: Configure signing in build.gradle
         run: |
-          cat > android/keystore.properties <<EOF
-          storeFile=app/videobatty-release.keystore
-          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
-          keyAlias=videobatty
-          keyPassword=${{ secrets.KEYSTORE_PASSWORD }}
+          cat >> android/app/build.gradle << 'EOF'
+
+          android {
+              signingConfigs {
+                  release {
+                      storeFile file("videobatty-release.keystore")
+                      storePassword System.getenv("KEYSTORE_PASSWORD")
+                      keyAlias "videobatty"
+                      keyPassword System.getenv("KEYSTORE_PASSWORD")
+                  }
+              }
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.release
+                  }
+                  debug {
+                      signingConfig signingConfigs.release
+                  }
+              }
+          }
           EOF
 
-      - name: Build signed release APK and AAB
+      - name: Build Signed APK (debug variant - direct install/share)
         working-directory: android
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
           chmod +x gradlew
-          ./gradlew clean assembleRelease bundleRelease
+          ./gradlew assembleDebug
+
+      - name: Build Signed Release APK + AAB (Play Store-ready)
+        working-directory: android
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          ./gradlew assembleRelease
+          ./gradlew bundleRelease
+
+      - name: Upload debug APK (share directly with users)
+        uses: actions/upload-artifact@v4
+        with:
+          name: videobatty-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
 
       - name: Upload release APK
         uses: actions/upload-artifact@v4
@@ -85,7 +109,7 @@ jobs:
           name: videobatty-release-apk
           path: android/app/build/outputs/apk/release/app-release.apk
 
-      - name: Upload release AAB
+      - name: Upload release AAB (Play Store upload করতে এটা লাগবে)
         uses: actions/upload-artifact@v4
         with:
           name: videobatty-release-aab
