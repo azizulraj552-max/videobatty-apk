@@ -11,9 +11,5 @@
   "android": {
     "allowMixedContent": false
   },
-  "plugins": {
-    "AdMob": {
-      "appId": "ca-app-pub-3036349500013592~4085923502"
-    }
   }
 }
