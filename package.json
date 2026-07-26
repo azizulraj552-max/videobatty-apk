@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "echo 'no build step needed - remote URL mode'"
+    "build": "echo 'no build step needed - remote URL mode'",
+    "start": "echo 'App deployed successfully'"
   },
   "dependencies": {
     "@capacitor/core": "^6.1.2",
