@@ -48,19 +48,23 @@
     .auth-error { color:#ff5c8a; font-size:12px; margin-bottom:10px; min-height:14px; }
 
     /* ---------- হেডার + এনার্জি অর্ব ---------- */
-    .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
-    .profile { display:flex; align-items:center; gap:10px; cursor:pointer; }
-    .profile-avatar-ring { width:48px; height:48px; border-radius:50%; padding:2px; background:linear-gradient(135deg,#ff2fb0,#7b2ff7,#00e5ff); }
+    .header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; position:relative; }
+    .header::after { content:''; position:absolute; left:0; right:0; bottom:-9px; height:1px; background:linear-gradient(90deg, transparent, rgba(0,229,255,0.35), transparent); }
+    .profile { display:flex; align-items:center; gap:10px; cursor:pointer; transition:transform 0.15s ease; }
+    .profile:active { transform:scale(0.96); }
+    .profile-avatar-ring { width:48px; height:48px; border-radius:50%; padding:2px; background:linear-gradient(135deg,#ff2fb0,#7b2ff7,#00e5ff); box-shadow:0 0 16px rgba(123,47,247,0.5); }
     .profile-avatar-ring img { width:100%; height:100%; border-radius:50%; object-fit:cover; display:block; border:2px solid #0a0714; }
     .profile-name { font-weight:bold; font-size:15px; }
     .profile-sub { font-size:10px; color:#8890a8; }
 
-    .energy-orb { position:relative; width:58px; height:58px; cursor:pointer; }
+    .energy-orb { position:relative; width:58px; height:58px; cursor:pointer; transition:transform 0.15s ease; }
+    .energy-orb:active { transform:scale(0.94); }
     .energy-orb svg { transform:rotate(-90deg); }
     .energy-orb .orb-track { fill:none; stroke:rgba(255,255,255,0.08); stroke-width:5; }
-    .energy-orb .orb-fill { fill:none; stroke:url(#orbGrad); stroke-width:5; stroke-linecap:round; transition:stroke-dashoffset 0.8s cubic-bezier(0.4,0,0.2,1); }
-    .energy-orb .orb-core { position:absolute; inset:6px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #2a1f4a, #0f0a1e); display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 12px rgba(255,214,0,0.15); }
+    .energy-orb .orb-fill { fill:none; stroke:url(#orbGrad); stroke-width:5; stroke-linecap:round; transition:stroke-dashoffset 0.8s cubic-bezier(0.4,0,0.2,1); filter:drop-shadow(0 0 4px rgba(0,229,255,0.7)); }
+    .energy-orb .orb-core { position:absolute; inset:6px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #2a1f4a, #0f0a1e); display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 12px rgba(255,214,0,0.15), 0 0 14px rgba(123,47,247,0.35); }
     .energy-orb .orb-icon { font-size:16px; }
+    .login-box h1 { text-shadow:0 0 22px rgba(123,47,247,0.55), 0 0 46px rgba(0,229,255,0.25); }
 
     /* ---------- ভিডিও প্ল্যাটফর্ম - স্টোরি সার্কেল ---------- */
     .story-row { display:flex; gap:16px; margin-bottom:6px; padding:4px 2px 10px; overflow-x:auto; }
@@ -165,9 +169,16 @@
     .rate-card .sub2 { font-size:13px; font-weight:bold; margin-top:4px; background:linear-gradient(90deg,#00e5ff,#7b2ff7); -webkit-background-clip:text; background-clip:text; color:transparent; }
     .rate-card .sub { color:#8890a8; font-size:10px; margin-top:6px; }
 
-    .p-action-btn { width:100%; padding:15px 16px; border-radius:18px; border:none; font-weight:bold; font-size:13px; margin-bottom:10px; cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px; color:#fff; }
-    .p-action-btn.primary { background:linear-gradient(120deg,#ff2fb0,#7b2ff7,#00e5ff); box-shadow:0 8px 20px rgba(123,47,247,0.35); }
-    .p-action-btn .arrow { margin-left:auto; color:#556; }
+    .p-action-btn { width:100%; padding:15px 16px; border-radius:18px; border:1px solid rgba(255,255,255,0.06); font-weight:bold; font-size:13px; margin-bottom:10px; cursor:pointer; text-align:left; display:flex; align-items:center; gap:12px; color:#fff; position:relative; overflow:hidden; transition:transform 0.15s ease, box-shadow 0.2s ease; }
+    .p-action-btn::after { content:''; position:absolute; top:0; left:-60%; width:40%; height:100%; background:linear-gradient(120deg, transparent, rgba(255,255,255,0.18), transparent); transform:skewX(-20deg); transition:left 0.6s ease; }
+    .p-action-btn:active { transform:scale(0.97); }
+    .p-action-btn:hover::after { left:130%; }
+    .p-action-btn.primary { background:linear-gradient(120deg,#ff2fb0,#7b2ff7,#00e5ff); background-size:200% 200%; animation: gradShift 6s ease infinite; box-shadow:0 8px 24px rgba(123,47,247,0.45); }
+    .p-action-btn .arrow { margin-left:auto; color:#556; transition:transform 0.2s ease, color 0.2s ease; }
+    .p-action-btn:hover .arrow { color:#00e5ff; transform:translateX(3px); }
+    .p-stat-card { transition:transform 0.2s ease, box-shadow 0.2s ease; }
+    .p-stat-card:active { transform:scale(0.96); }
+    .profile-avatar-wrap .big-ring { box-shadow:0 0 24px rgba(123,47,247,0.5), 0 0 46px rgba(0,229,255,0.25); animation: softPulse 3s infinite; }
     .referral-box { border-radius:18px; padding:14px 16px; margin-bottom:16px; position:relative; overflow:hidden; }
     .referral-box::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg, rgba(0,229,255,0.1), rgba(123,47,247,0.08)); z-index:-1; }
     .referral-box .rtitle { font-size:11px; color:#8ff; margin-bottom:8px; font-weight:600; }
@@ -339,18 +350,11 @@
         <div class="earn-option glass" id="opt-reward2" onclick="watchAd('reward2', this)"><div class="eicon">🖼️</div><div class="einfo"><div class="etitle">স্পন্সরড অ্যাড দেখুন</div><div class="esub">একটা ছবি/ব্যানার অ্যাড</div></div><div class="ereward">+৫</div></div>
         <div class="earn-option glass" id="opt-offerwall" onclick="watchAd('offerwall', this)"><div class="eicon">🎁</div><div class="einfo"><div class="etitle">বোনাস অফার দেখুন</div><div class="esub">দীর্ঘ ভিডিও</div></div><div class="ereward">+৫</div></div>
         <div class="earn-option glass" id="opt-reward3" onclick="watchAd('reward3', this)"><div class="eicon">📽️</div><div class="einfo"><div class="etitle">এক্সট্রা ভিডিও অ্যাড দেখুন</div><div class="esub">নতুন বাড়তি অপশন</div></div><div class="ereward">+১০</div></div>
-        <div class="earn-option glass" id="dailyBonusOption" onclick="claimDailyBonus(this)"><div class="eicon">📅</div><div class="einfo"><div class="etitle">ডেইলি বোনাস দাবি করুন</div><div class="esub">প্রতিদিন একবার, বিনামূল্যে</div></div><div class="ereward">+১০</div></div>
+        <div class="earn-option glass" id="dailyBonusOption" onclick="claimDailyBonusWithAd(this)"><div class="eicon">📅</div><div class="einfo"><div class="etitle">ডেইলি বোনাস দাবি করুন</div><div class="esub">একটা ছোট অ্যাড দেখে বোনাস নিন - প্রতিদিন একবার</div></div><div class="ereward">+১০</div></div>
         <p class="earn-hub-note">প্রতিদিন সর্বোচ্চ কয়টা অ্যাড দেখা যাবে তার একটা সীমা আছে (বট/অপব্যবহার ঠেকাতে)।</p>
 
-        <!-- ব্যানার অ্যাড: কয়েন/Earn Hub পেজের একদম নিচে (Adsterra 300x250) -->
-        <div style="margin-top:20px; display:flex; justify-content:center;">
-            <div>
-                <script>
-                    atOptions = { 'key' : '731c017c520be0647988157ef399eec9', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
-                </script>
-                <script src="https://www.highperformanceformat.com/731c017c520be0647988157ef399eec9/invoke.js"></script>
-            </div>
-        </div>
+        <!-- বড় ব্যানার অ্যাড: কয়েন/Earn Hub পেজের একদম নিচে -->
+        <div class="banner-ad glass" id="earnHubBigBanner" style="margin-top:20px; min-height:280px; flex-direction:column;"></div>
     </div>
 </div>
 
@@ -392,12 +396,7 @@
         <button class="p-action-btn glass" onclick="toggleLanguage()">🌐 <span id="langBtnLabel">Switch to English</span> <span class="arrow">›</span></button>
         <button class="p-action-btn glass" style="border-color:#f55; color:#f55;" onclick="doLogout()"><span data-i18n-bn="🚪 লগআউট" data-i18n-en="🚪 Logout">🚪 লগআউট</span></button>
 
-        <div class="banner-ad" style="margin-top:16px; min-height:70px; flex-direction:column;">
-            <script>
-                atOptions = { 'key' : '5380ed371514061a59a5c80701fb5ea8', 'format' : 'iframe', 'height' : 60, 'width' : 468, 'params' : {} };
-            </script>
-            <script src="https://www.highperformanceformat.com/5380ed371514061a59a5c80701fb5ea8/invoke.js"></script>
-        </div>
+        <div class="banner-ad glass" id="profileBigBanner" style="margin-top:16px; min-height:280px; flex-direction:column;"></div>
         <div class="banner-ad" style="margin-top:10px; flex-direction:column;">
             <script async="async" data-cfasync="false" src="https://pl30242884.effectivecpmnetwork.com/8934277a23ba15c26942eb495cf795a2/invoke.js"></script>
             <div id="container-8934277a23ba15c26942eb495cf795a2"></div>
@@ -457,8 +456,58 @@
         { id: 'SrQVRNPypqg', title: 'Nonstop Funny Moments - Comedy Compilation' },
         { id: 'nEYUrGGY9DM', title: 'Best Viral Funny Videos' },
         { id: '1RoeECj_EdQ', title: 'Best Funny Videos: Ultimate Compilation' },
-        { id: 'U1r3oJHliZg', title: 'Ultimate Viral Funny Moments - Top Comedy Clips' }
+        { id: 'U1r3oJHliZg', title: 'Ultimate Viral Funny Moments - Top Comedy Clips' },
+        { id: 'twEwJ3eYCsE', title: 'Best Kid Fails of 2025' },
+        { id: 'ZVA23IX1AYk', title: "Fails So Bad They're Actually Hilarious" },
+        { id: '-J9XMEUczs8', title: 'Try Not to Laugh Challenge - Fail Compilation' },
+        { id: '_BH7PqErHvE', title: 'Try Not to Laugh Challenge - Viral Funny Videos' },
+        { id: 'WXP0xdVIc3Y', title: 'Try Not to Laugh Challenge - Instant Funny Moments' },
+        { id: 'wVmGBgrfsDw', title: 'Top 100 Funniest Videos Ever - Part 4' },
+        { id: 'oT_v5tAVtv0', title: 'Top 100 Funniest Videos Ever - Part 6' },
+        { id: 'F9BSEBN-ENs', title: 'Try Not to Laugh Impossible - Best Funny Videos' },
+        { id: 'jldF9HXIp20', title: 'Try Not to Laugh Impossible - Funny Compilation' },
+        { id: '0OQtbYkl_wQ', title: 'Try Not to Laugh Compilation - Part 1' },
+        { id: 'FfFyuM1jrP4', title: 'Try Not to Laugh Challenge - Ultimate Funny Fails' },
+        { id: 'lSGtRtKeRE4', title: 'Try Not to Laugh - Best Fails of April' },
+        { id: 'TBQVtY5soQU', title: 'Try Not to Laugh - Funniest Animal Compilation' },
+        { id: 'DymJvK1Dj0s', title: 'Best of Funny Animals' },
+        { id: 'HfY8tX2Xa-w', title: 'Funny Animals - Cats, Dogs & More in Epic Fails' },
+        { id: 'ksMsE1yG9RI', title: 'Funny Pets - Hilarious Animals Compilation' },
+        { id: 'h3V-U-IrPBk', title: 'Funniest Animals Video' },
+        { id: 'DpB7fA2Bi5U', title: 'Funniest Animals Videos' },
+        { id: 'eODG6UGY78A', title: 'Best Funny Animals Video' },
+        { id: 'E4Z7LBO-XXE', title: 'Funniest Animals Videos - Crying with Laughter' },
+        { id: '5_mA_AaLa6k', title: 'Funny Baby & Parents Compilation' },
+        { id: 'eSUGjN6zE_0', title: 'Hilarious Baby Cute Compilation' },
+        { id: '_nK_DCH5jDM', title: 'Try Not to Laugh - Funny Baby Compilation' },
+        { id: 'DzlhL1qERXQ', title: 'Funny Baby Moments - Try Not to Laugh' },
+        { id: 'sVbtBdVJbZE', title: 'Hilarious Baby Dancing Compilation' },
+        { id: 'e7C3CmatzZM', title: 'Funniest Baby Reactions - Impossible Try Not to Laugh' },
+        { id: 'kT9X5-Lomgc', title: 'Funniest Baby Reactions Ever' },
+        { id: 'LTx0UXlJK1s', title: 'Best Funny Baby Videos Compilation' },
+        { id: 'aTkq6doxIAw', title: 'Ultimate Funny Fail Compilation' },
+        { id: 'PQhtoF-LU6g', title: 'Ultimate Laughs - Pranks Compilation' },
+        { id: 'FszGCqleSHA', title: 'Top 100 Funniest Videos Ever - Part 49' },
+        { id: 'szqJfD_XN_M', title: 'Viral Prank Compilation' },
+        { id: 'Z-S57PjbzQ0', title: 'Top Pranks Compilation' },
+        { id: 'Y6t5c13G9z0', title: 'Insane New Prank Compilation' },
+        { id: 'NDDhOLNgWT4', title: 'Funniest Pranks Compilation' },
+        { id: 'p7oyr_zJFLA', title: 'Funny Sports Fails Compilation Reaction' },
+        { id: 'gkrKASFAQY0', title: 'Funny Sports Fails Compilation' },
+        { id: 'XFM5MvOlcIo', title: 'Funniest Cat Compilation' },
+        { id: '6T4y91VWwjI', title: 'Funny Cat Compilation - Best Cat Moments' },
+        { id: '0mtV0HaYZTw', title: 'Ultimate Funny Cats Compilation' },
+        { id: '-TfycPPBr28', title: 'Funny Cats Compilation - Try Not to Laugh' },
+        { id: 'mH8lfQmIJas', title: 'Funny Cats Compilation - Try Not to Laugh Challenge' },
+        { id: 'M2_rc0dYLoc', title: 'Ultimate Funny Cats Compilation #8' },
+        { id: 'WEFMo9YD61o', title: 'Funniest Cats Compilation - Cat Fails' },
+        { id: 'lU0ZdcoSFmM', title: 'Try Not to Laugh - Ultimate Funny Cat Compilation' },
+        { id: 'NWlL1PoJ56k', title: 'Funniest Cat Clips - Try Not to Laugh' },
+        { id: 'Rc1xYcBVOco', title: 'Funny Cats Compilation - Hilarious Cat Moments' }
     ];
+    // 🔎 নোট: এই ৫১টা আইডি সার্চ করে বাছাই করা হয়েছে (জুলাই ২০২৬ পর্যন্ত)।
+    // YouTube-এ মাঝেমধ্যে পুরনো ভিডিও প্রাইভেট/মুছে যেতে পারে - কোনোটা কাজ না
+    // করলে ভিডিও ফিডে ✕ চিহ্নে মুছে ফেলুন বা উপরের ইনপুট দিয়ে নতুন লিংক যোগ করুন।
 
     // ================= ইউটিউব/টিকটক এখন অ্যাপের ভেতরেই (iframe) খোলে =================
     // ⚠️ সততার সাথে জানানো দরকার: YouTube/TikTok তাদের মূল ওয়েবসাইট অনেক সময়
@@ -531,6 +580,60 @@
         t.innerText = msg; t.style.display = 'block';
         clearTimeout(t._timer); t._timer = setTimeout(() => t.style.display = 'none', ms);
     }
+
+    // ================= মেয়ে কণ্ঠে ভয়েস (ব্রাউজারের বিল্ট-ইন Text-to-Speech, কোনো ফাইল/সার্ভার লাগে না) =================
+    // ⚠️ ডিভাইসভেদে উপলব্ধ ভয়েস আলাদা হয় - সব ফোনে "মেয়ে কণ্ঠ" নাও থাকতে পারে,
+    // তখন ডিভাইসের ডিফল্ট ভয়েস ব্যবহার হবে (এটা ব্রাউজার/OS-এর সীমাবদ্ধতা,
+    // কোডে ঠিক করা সম্ভব না)।
+    let cachedVoices = [];
+    function loadVoices() { cachedVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : []; }
+    if (window.speechSynthesis) {
+        loadVoices();
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+    function pickFemaleVoice() {
+        if (!cachedVoices.length) loadVoices();
+        const femaleHints = ['female', 'woman', 'girl', 'zira', 'samantha', 'susan', 'victoria', 'karen', 'moira', 'tessa', 'salli', 'joanna', 'ivy', 'kendra', 'kimberly'];
+        let v = cachedVoices.find(v => femaleHints.some(h => v.name.toLowerCase().includes(h)));
+        if (!v) v = cachedVoices.find(v => v.lang && v.lang.startsWith('en'));
+        return v || cachedVoices[0] || null;
+    }
+    function speakFemale(text) {
+        try {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel(); // আগেরটা কথা বলতে থাকলে থামিয়ে নতুনটা বলবে
+            const u = new SpeechSynthesisUtterance(text);
+            const v = pickFemaleVoice();
+            if (v) u.voice = v;
+            u.pitch = 1.3; // একটু উঁচু পিচ - মেয়ে কণ্ঠের মতো শোনাতে সাহায্য করে
+            u.rate = 1;
+            window.speechSynthesis.speak(u);
+        } catch (e) { /* কিছু পুরনো WebView-তে speechSynthesis নাও থাকতে পারে - নিরাপদে বাদ */ }
+    }
+
+    // ================= বাটনে চাপলে ক্লিক সাউন্ড (Web Audio দিয়ে তৈরি, কোনো অডিও ফাইল লাগে না) =================
+    let audioCtx = null;
+    function playClickSound() {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+        } catch (e) { /* সাইলেন্ট */ }
+    }
+    // সব বাটন/ক্লিকযোগ্য উপাদানে ক্লিক সাউন্ড - ইভেন্ট ডেলিগেশন দিয়ে, প্রতিটা বাটনে আলাদা করে লাগাতে হবে না
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('button, .ad-btn, .earn-option, .nav-item, .story-item, .p-action-btn, .rcopy, .floating-ad-btn, .ad-ready-banner, .modal-box button, .profile, .energy-orb')) {
+            playClickSound();
+        }
+    }, true);
     async function api(path, options = {}) {
         const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
         if (authToken) headers['Authorization'] = 'Bearer ' + authToken;
@@ -577,6 +680,7 @@
             applyUserToUI();
             switchToApp();
             claimDailyBonus(null, true);
+            speakFemale('Welcome to my home dear friend');
         } catch (e) { errEl.innerText = e.message; }
     }
 
@@ -591,7 +695,6 @@
     function switchToApp() {
         document.getElementById('page-login').classList.remove('active');
         document.getElementById('page-home').classList.add('active');
-        initAdMob();
     }
 
     let displayedCoins = 0;
@@ -717,58 +820,29 @@
     // অবিশ্বস্ত ছিল। এখন অ্যাড অ্যাপের ভেতরেই (iframe) দেখানো হয়, এবং
     // টাইমার ০ না হওয়া পর্যন্ত "পয়েন্ট নিন" বাটন disabled থাকে - তাই
     // সময় শেষ না করে পয়েন্ট নেওয়া সম্ভব না।
-    // ================= AdMob (শুধু APK-তে কাজ করে, ওয়েবসাইটে না) =================
-    // ⚠️ এই ad unit ID গুলো তখনই কাজ করবে যখন APK-তে @capacitor-community/admob
-    // প্লাগইন যোগ করে রিবিল্ড করা হবে (package.json-এ যোগ করা আছে)। প্লেইন
-    // ব্রাউজারে (ওয়েবসাইট ভার্সনে) এই কোড কিছু করবে না, স্বয়ংক্রিয়ভাবে
-    // Adsterra ফলব্যাক ব্যবহার হবে - কোনো এরর হবে না।
-    const ADMOB_UNITS = {
-        appOpen: 'ca-app-pub-3036349500013592/7657622995',
-        banner: 'ca-app-pub-3036349500013592/6025691139',
-        interstitial: 'ca-app-pub-3036349500013592/4864918631',
-        nativeAdvanced: 'ca-app-pub-3036349500013592/4137894396',
-        reward: 'ca-app-pub-3036349500013592/8946653930',
-        rewardInterstitial: 'ca-app-pub-3036349500013592/5962377886'
-    };
-    function getAdMob() { return window.Capacitor?.Plugins?.AdMob || null; }
-
-    async function initAdMob() {
-        const AdMob = getAdMob();
-        if (!AdMob) return; // ওয়েবসাইটে চলবে, এখানেই থেমে যাবে - সমস্যা নেই
-        try {
-            await AdMob.initialize({});
-            // App Open Ad - অ্যাপ চালু/রিজিউম হলে দেখাবে
-            await AdMob.prepareInterstitial({ adId: ADMOB_UNITS.appOpen });
-            await AdMob.showInterstitial().catch(() => {});
-            // ব্যানার - স্ক্রিনের নিচে স্থায়ীভাবে
-            await AdMob.showBanner({ adId: ADMOB_UNITS.banner, adSize: 'ADAPTIVE_BANNER', position: 'BOTTOM_CENTER' });
-            // ব্রাউজার ব্যানার স্লটগুলো লুকিয়ে ফেলা (নেটিভ ব্যানার আলাদাভাবে স্ক্রিনে বসবে, ডুপ্লিকেট এড়াতে)
-            document.querySelectorAll('.banner-ad').forEach(el => el.style.display = 'none');
-        } catch (e) { console.error('AdMob init error:', e); }
+    // ================= বিজ্ঞাপন: শুধু Adsterra (AdMob সরিয়ে ফেলা হয়েছে) =================
+    // অ্যাপটা যেহেতু Capacitor WebView-তে এই একই HTML/JS লোড করে, তাই ওয়েবসাইট
+    // ও APK দুটোতেই এখন একই Adsterra কোড কাজ করবে - আলাদা নেটিভ প্লাগইনের
+    // দরকার নেই।
+    // ⚠️ নীতিগত সতর্কতা (আগের মতোই বহাল): effectivecpmnetwork.com-এর Direct
+    // Link ফরম্যাট মূলত "স্বেচ্ছা ক্লিক-থ্রু" ট্রাফিকের জন্য, "দেখলেই রিওয়ার্ড"
+    // মডেলের জন্য অফিসিয়ালি বানানো না। এভাবে ব্যবহার করলে Adsterra-র Publisher
+    // Terms অনুযায়ী "invalid/incentivized traffic" হিসেবে গণ্য হয়ে অ্যাকাউন্ট
+    // রিভিউ/সাসপেন্ড হওয়ার ঝুঁকি থাকে। ব্যবহার করার আগে Adsterra সাপোর্টের
+    // সাথে একবার নিশ্চিত হয়ে নেওয়াই নিরাপদ।
+    function pickNextSmartlink() {
+        const url = AD_SMARTLINKS[smartlinkIndex % AD_SMARTLINKS.length];
+        smartlinkIndex++;
+        return url;
     }
 
-    function watchAd(source, el) {
-        pendingAdSource = source; pendingAdEl = el;
-        const AdMob = getAdMob();
-        const isVideoType = REWARD_TYPE_MAP[source] === 'video';
+    let adFlowPromiseResolve = null, adFlowPromiseReject = null;
 
-        if (AdMob) {
-            // ================= APK-তে: রিয়েল AdMob অ্যাড =================
-            const unitId = isVideoType ? ADMOB_UNITS.reward : ADMOB_UNITS.rewardInterstitial;
-            showToast('📺 বিজ্ঞাপন লোড হচ্ছে...');
-            AdMob.prepareRewardVideoAd({ adId: unitId }).then(() => {
-                AdMob.addListener('onRewardedVideoAdReward', () => {
-                    claimReward(pendingAdSource, pendingAdEl);
-                    pendingAdSource = null; pendingAdEl = null;
-                });
-                return AdMob.showRewardVideoAd();
-            }).catch(() => {
-                showToast('⚠️ এই মুহূর্তে বিজ্ঞাপন লোড করা যায়নি, একটু পর আবার চেষ্টা করুন');
-            });
-            return;
-        }
+    // অ্যাড-টাইমার মডাল দেখানো + শেষে promise resolve করা (কল করা ফাংশন ঠিক করে তারপর কী হবে - পয়েন্ট নাকি ডেইলি বোনাস)
+    function runAdTimerFlow(seconds) {
+        // Direct Link ইমপ্রেশনের জন্য নতুন ট্যাবে ঘুরিয়ে ঘুরিয়ে একটা লিংক খোলা (ঐচ্ছিক - পপ-আপ ব্লক হলেও সমস্যা নেই)
+        try { window.open(pickNextSmartlink(), '_blank'); } catch (e) {}
 
-        // ================= ওয়েবসাইটে: Adsterra ব্যানার + বাধ্যতামূলক টাইমার =================
         const slot = document.getElementById('adViewerFrame');
         slot.innerHTML = '';
         injectAdBanner(slot, '731c017c520be0647988157ef399eec9', 300, 250);
@@ -776,7 +850,7 @@
         btn.disabled = true; btn.style.opacity = '0.4';
         document.getElementById('adViewerModal').classList.add('show');
 
-        let remaining = isVideoType ? AD_VIEW_SECONDS : 5;
+        let remaining = seconds;
         document.getElementById('adTimerDisplay').innerText = remaining + 's';
         btn.innerText = `⏳ ${remaining}s অপেক্ষা করুন...`;
         clearInterval(adTimerInterval);
@@ -792,6 +866,21 @@
                 btn.innerText = `⏳ ${remaining}s অপেক্ষা করুন...`;
             }
         }, 1000);
+
+        return new Promise((resolve, reject) => {
+            adFlowPromiseResolve = resolve;
+            adFlowPromiseReject = reject;
+        });
+    }
+
+    function watchAd(source, el) {
+        pendingAdSource = source; pendingAdEl = el;
+        const isVideoType = REWARD_TYPE_MAP[source] === 'video';
+        const seconds = isVideoType ? AD_VIEW_SECONDS : 5;
+        runAdTimerFlow(seconds).then(() => {
+            claimReward(pendingAdSource, pendingAdEl);
+            pendingAdSource = null; pendingAdEl = null;
+        }).catch(() => { /* ইউজার আগেই বন্ধ করে দিয়েছে - কিছু হবে না */ });
     }
     // কোন সোর্স "সাধারণ" (৫ পয়েন্ট) আর কোনটা "ভিডিও" (১০ পয়েন্ট) টাইপ, সার্ভারের REWARD_MAP-এর সাথে মিলিয়ে
     const REWARD_TYPE_MAP = {
@@ -805,11 +894,12 @@
         document.getElementById('adViewerFrame').innerHTML = '';
         const btn = document.getElementById('adClaimBtn');
         if (gotFullTime && !btn.disabled) {
-            claimReward(pendingAdSource, pendingAdEl);
-        } else if (gotFullTime && btn.disabled) {
-            showToast('⚠️ টাইমার এখনো শেষ হয়নি, পয়েন্ট যোগ হয়নি');
+            if (adFlowPromiseResolve) adFlowPromiseResolve();
+        } else {
+            if (gotFullTime && btn.disabled) showToast('⚠️ টাইমার এখনো শেষ হয়নি, পয়েন্ট যোগ হয়নি');
+            if (adFlowPromiseReject) adFlowPromiseReject();
         }
-        pendingAdSource = null; pendingAdEl = null;
+        adFlowPromiseResolve = null; adFlowPromiseReject = null;
     }
 
     async function claimReward(source, el) {
@@ -819,6 +909,7 @@
             applyUserToUI();
             spawnConfetti();
             showToast(`✅ ধন্যবাদ! +${data.reward} পয়েন্ট যোগ হয়েছে`);
+            speakFemale('Good');
             if (source === 'bonus') dismissBanner();
             if (source === 'floating') startFloatingCooldown();
             if (el) startButtonCooldown(el, 8);
@@ -842,13 +933,6 @@
     function showInterstitial() {
         if (!authToken) return; // লগইন পেজে দেখাবে না
         if (document.getElementById('adViewerModal').classList.contains('show')) return; // অ্যাড দেখার মাঝে না
-        const AdMob = getAdMob();
-        if (AdMob) {
-            AdMob.prepareInterstitial({ adId: ADMOB_UNITS.interstitial })
-                .then(() => AdMob.showInterstitial())
-                .catch(() => {});
-            return;
-        }
         const slot = document.getElementById('interstitialAdSlot');
         slot.innerHTML = '';
         injectAdBanner(slot, '731c017c520be0647988157ef399eec9', 300, 250);
@@ -906,8 +990,21 @@
         try {
             const data = await api('/api/daily-bonus', { method: 'POST' });
             currentUser = data.user; applyUserToUI();
-            if (!data.alreadyClaimed) showToast(`🎁 ডেইলি বোনাস! +${data.bonus} পয়েন্ট (স্ট্রিক: ${data.streak} দিন)`, 4000);
+            if (!data.alreadyClaimed) {
+                showToast(`🎁 ডেইলি বোনাস! +${data.bonus} পয়েন্ট (স্ট্রিক: ${data.streak} দিন)`, 4000);
+                speakFemale('Good');
+                spawnConfetti();
+            }
         } catch (e) { if (!silent) showToast(e.message); }
+    }
+
+    // বাটনে ট্যাপ করে ডেইলি বোনাস নিলে - আগে একটা অ্যাড দেখাবে, তারপর বোনাস যোগ হবে
+    // (অ্যাপ চালু হওয়ার সময় যে স্বয়ংক্রিয় সাইলেন্ট চেক হয় (উপরে claimDailyBonus(null, true))
+    // সেটাতে অ্যাড দেখানো হয় না - শুধু ইউজার নিজে বাটনে চাপলেই অ্যাড আসবে)
+    function claimDailyBonusWithAd(el) {
+        runAdTimerFlow(5).then(() => {
+            claimDailyBonus(el, false);
+        }).catch(() => {});
     }
 
     // ================= ভিডিও ফিড =================
@@ -989,7 +1086,7 @@
     // ================= Earn Hub =================
     function openEarnHub() { document.getElementById('earnHubOverlay').classList.add('show'); }
     function closeEarnHub() { document.getElementById('earnHubOverlay').classList.remove('show'); }
-    function claimDailyBonusFromHub() { claimDailyBonus(document.getElementById('dailyBonusOption')); }
+    function claimDailyBonusFromHub() { claimDailyBonusWithAd(document.getElementById('dailyBonusOption')); }
 
     // ================= প্রোফাইল =================
     function openProfile() { document.getElementById('profileOverlay').classList.add('show'); }
@@ -1067,7 +1164,6 @@
     (async function init() {
         toggleAuthMode();
         applyLanguage(currentLang);
-        initAdMob(); // APK-তে থাকলে চালু হবে, ওয়েবসাইটে চুপচাপ কিছু করবে না
         authToken = await tokenGet();
         if (authToken) restoreSession();
     })();
@@ -1077,13 +1173,12 @@
 <script async src="https://www.tiktok.com/embed.js"></script>
 
 <script>
-    // ================= Adsterra Popunder / Social Bar (ঐচ্ছিক, ডিফল্ট বন্ধ) =================
-    // ⚠️ এই দুটো ফরম্যাট বেশ intrusive (Popunder নতুন ট্যাব/উইন্ডো জোর করে খোলে,
-    // Social Bar স্ক্রিনে সবসময় ভাসমান থাকে)। এগুলো চালু করলে বাড়তি আয় হতে পারে,
-    // কিন্তু ইউজার এক্সপেরিয়েন্স খারাপ হতে পারে এবং Play Store-এ APK আকারে দিলে
-    // policy violation হিসেবে ধরা পড়তে পারে। ঝুঁকি বুঝে নিজ দায়িত্বে চালু করুন।
-    const ENABLE_POPUNDER = false;   // true করলে Popunder চালু হবে
-    const ENABLE_SOCIAL_BAR = false; // true করলে Social Bar চালু হবে
+    // ================= Adsterra Social Bar (এখন চালু করা হয়েছে, যেমনটা চাওয়া হয়েছিল) =================
+    // ⚠️ মনে রাখবেন: Social Bar স্ক্রিনের উপর সবসময় ভাসমান থাকে - এটা বাড়তি
+    // আয় দেয় কিন্তু ইউজার এক্সপেরিয়েন্স কিছুটা ভারী মনে হতে পারে। Play Store
+    // policy-তে সমস্যা হলে ENABLE_SOCIAL_BAR = false করে দিন।
+    const ENABLE_POPUNDER = false;   // true করলে Popunder চালু হবে (খুবই intrusive, ডিফল্ট বন্ধ রাখা হলো)
+    const ENABLE_SOCIAL_BAR = true;  // চালু করা হয়েছে (ইউজারের অনুরোধে)
 
     if (ENABLE_POPUNDER) {
         const s = document.createElement('script');
@@ -1095,6 +1190,27 @@
         s.src = 'https://pl30242883.effectivecpmnetwork.com/01/bf/79/01bf792acb9f5cd5d55ba8490f00c933.js';
         document.body.appendChild(s);
     }
+
+    // ================= নতুন "বড়" নেটিভ ব্যানার (pl30242884) - ৩টা পেজের নিচে বসানো হবে =================
+    // ⚠️ ফিক্স: একই container id (Adsterra যেটা হার্ডকোড করে রেখেছে) একাধিক
+    // পেজে সরাসরি বসালে দ্বিতীয়/তৃতীয়টা কাজ করবে না (ডুপ্লিকেট আইডি সমস্যা,
+    // আগের ব্যানার-কনফ্লিক্ট ফিক্সের মতোই)। তাই প্রতিটাকে নিজস্ব iframe-এ
+    // আলাদা করে দেওয়া হলো - এতে সবগুলো একসাথে ঠিকভাবে দেখাবে।
+    function injectBigNativeBanner(containerId) {
+        const wrap = document.getElementById(containerId);
+        if (!wrap) return;
+        const iframe = document.createElement('iframe');
+        iframe.style.width = '100%'; iframe.style.minHeight = '280px'; iframe.style.border = 'none';
+        iframe.srcdoc = `<!DOCTYPE html><html><body style="margin:0; background:transparent;">
+            <div id="container-8934277a23ba15c26942eb495cf795a2"></div>
+            <script async="async" data-cfasync="false" src="https://pl30242884.effectivecpmnetwork.com/8934277a23ba15c26942eb495cf795a2/invoke.js"><\/script>
+        </body></html>`;
+        wrap.appendChild(iframe);
+    }
+    // হোম, কয়েন/Earn Hub ও প্রোফাইল - এই ৩টা পেজের একদম নিচে একই বড় ব্যানার বসানো হলো
+    injectBigNativeBanner('homeBannerAd');
+    injectBigNativeBanner('earnHubBigBanner');
+    injectBigNativeBanner('profileBigBanner');
 </script>
 </body>
-     </html>
+               </html>
