@@ -3,7 +3,7 @@ name: Build Signed Android APK
 on:
   push:
     branches: [ main ]
-  workflow_dispatch: {}
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -26,37 +26,19 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Sync AdMob App ID into capacitor.config.json from admob-app-id.txt
-        run: |
-          APPID=$(cat admob-app-id.txt | tr -d '[:space:]')
-          if [ -n "$APPID" ]; then
-            jq --arg id "$APPID" '.plugins.AdMob.appId = $id' capacitor.config.json > tmp.json && mv tmp.json capacitor.config.json
-            echo "AdMob App ID synced: $APPID"
-            cat capacitor.config.json
-          fi
-
-      - name: Add Android platform (fresh each run - always regenerated)
+      - name: Add Android platform
         run: npx cap add android
-
-      - name: Ensure AdMob App ID is in AndroidManifest.xml
-        run: |
-          MANIFEST="android/app/src/main/AndroidManifest.xml"
-          APPID=$(cat admob-app-id.txt | tr -d '[:space:]')
-          if [ -n "$APPID" ] && ! grep -q "APPLICATION_ID" "$MANIFEST"; then
-            sed -i "s#</application>#    <meta-data android:name=\"com.google.android.gms.ads.APPLICATION_ID\" android:value=\"$APPID\"/>\n</application>#" "$MANIFEST"
-          fi
 
       - name: Sync Capacitor
         run: npx cap sync android
 
-      # ================= 🔑 স্থায়ী সাইনিং কী =================
+      # === 🔑 Keystore setup ===
       - name: Decode signing keystore
         run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 --decode --ignore-garbage > android/app/videobatty-release.keystore
 
       - name: Configure signing in build.gradle
         run: |
-          cat >> android/app/build.gradle << 'EOF'
-
+          echo '
           android {
               signingConfigs {
                   release {
@@ -75,9 +57,9 @@ jobs:
                   }
               }
           }
-          EOF
+          ' >> android/app/build.gradle
 
-      - name: Build Signed APK (debug variant - direct install/share)
+      - name: Build Signed APK (debug)
         working-directory: android
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -85,7 +67,7 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Build Signed Release APK + AAB (Play Store-ready)
+      - name: Build Signed Release APK + AAB
         working-directory: android
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -93,7 +75,7 @@ jobs:
           ./gradlew assembleRelease
           ./gradlew bundleRelease
 
-      - name: Upload debug APK (share directly with users)
+      - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
           name: videobatty-debug-apk
@@ -104,9 +86,3 @@ jobs:
         with:
           name: videobatty-release-apk
           path: android/app/build/outputs/apk/release/app-release.apk
-
-      - name: Upload release AAB (Play Store upload করতে এটা লাগবে)
-        uses: actions/upload-artifact@v4
-        with:
-          name: videobatty-release-aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
