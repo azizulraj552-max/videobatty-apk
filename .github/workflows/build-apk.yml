@@ -1,4 +1,4 @@
-name: Build Signed Android APK
+Name: Build Signed Android APK
 
 on:
   push:
@@ -49,13 +49,9 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
-      # ================= 🔑 স্থায়ী সাইনিং কী (লগইন-হারানো বাগ ফিক্স) =================
-      # ⚠️ আগে প্রতিটা GitHub Actions রান নিজে থেকেই একটা নতুন র‍্যান্ডম debug
-      # keystore বানাতো, তাই প্রতিটা নতুন APK-কে Android আলাদা "অ্যাপ" হিসেবে
-      # ধরে নিত এবং পুরনোটার সব ডেটা (লগইন সেশন) মুছে দিত। এখন GitHub Secret-এ
-      # রাখা একটা স্থায়ী কী প্রতিবার ব্যবহার করা হয়, তাই আপডেট হলেও ডেটা থাকবে।
+      # ================= 🔑 স্থায়ী সাইনিং কী =================
       - name: Decode signing keystore
-        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d > android/app/videobatty-release.keystore
+        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d -i > android/app/videobatty-release.keystore
 
       - name: Configure signing in build.gradle
         run: |
