@@ -51,7 +51,7 @@ jobs:
 
       # ================= 🔑 স্থায়ী সাইনিং কী =================
       - name: Decode signing keystore
-        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 -d -i > android/app/videobatty-release.keystore
+        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 --decode --ignore-garbage > android/app/videobatty-release.keystore
 
       - name: Configure signing in build.gradle
         run: |
