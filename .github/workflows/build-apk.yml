@@ -1,4 +1,4 @@
-name: Build Signed Android APK
+Name: Build Signed Android APK
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -34,7 +34,10 @@ jobs:
 
       # === 🔑 Keystore setup ===
       - name: Decode signing keystore
-        run: echo "${{ secrets.SIGNING_KEYSTORE_BASE64 }}" | base64 --decode --ignore-garbage > android/app/videobatty-release.keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+        run: |
+          echo -n "$KEYSTORE_BASE64" | base64 --decode > android/app/videobatty-release.keystore
 
       - name: Configure signing in build.gradle
         run: |
