@@ -9,8 +9,7 @@
     "@capacitor/core": "^6.1.2",
     "@capacitor/android": "^6.1.2",
     "@capacitor/browser": "^6.0.3",
-    "@capacitor/preferences": "^6.0.3",
-    "@capacitor-community/adsterra": "^6.1.0"
+    "@capacitor/preferences": "^6.0.3"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.1.2"
