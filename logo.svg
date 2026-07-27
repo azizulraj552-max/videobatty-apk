@@ -1,0 +1,45 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0714"/>
+      <stop offset="100%" stop-color="#150e28"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff2fb0"/>
+      <stop offset="50%" stop-color="#7b2ff7"/>
+      <stop offset="100%" stop-color="#00e5ff"/>
+    </linearGradient>
+    <linearGradient id="playGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffe066"/>
+      <stop offset="100%" stop-color="#ffb300"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="14" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- ব্যাকগ্রাউন্ড -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+
+  <!-- অরোরা আলোর আভা -->
+  <circle cx="130" cy="120" r="120" fill="#7b2ff7" opacity="0.25" filter="url(#glow)"/>
+  <circle cx="390" cy="150" r="100" fill="#00e5ff" opacity="0.2" filter="url(#glow)"/>
+  <circle cx="380" cy="400" r="110" fill="#ff2fb0" opacity="0.18" filter="url(#glow)"/>
+
+  <!-- বাইরের গ্রেডিয়েন্ট রিং (স্টোরি-রিং স্টাইল) -->
+  <circle cx="256" cy="256" r="150" fill="none" stroke="url(#ringGrad)" stroke-width="14" opacity="0.9"/>
+
+  <!-- ভেতরের কাচের বৃত্ত -->
+  <circle cx="256" cy="256" r="128" fill="#12101c" opacity="0.9"/>
+
+  <!-- প্লে বাটন (ভিডিও প্রতীক) -->
+  <path d="M 220 190 L 220 322 L 330 256 Z" fill="url(#playGrad)"/>
+
+  <!-- ছোট কয়েন প্রতীক (নিচে-ডানে) -->
+  <circle cx="360" cy="340" r="46" fill="#0f0a1e" stroke="url(#playGrad)" stroke-width="6"/>
+  <text x="360" y="356" font-size="46" text-anchor="middle" fill="url(#playGrad)" font-family="Arial, sans-serif" font-weight="900">৳</text>
+</svg>
