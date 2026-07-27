@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard - ভিডিও বাত্তি</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    * { box-sizing: border-box; margin:0; padding:0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body {
+        background:#05050a;
+        background-image: linear-gradient(rgba(255,204,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,204,0,0.03) 1px, transparent 1px);
+        background-size: 24px 24px; color:#e8e8e8; min-height:100vh;
+    }
+    .setup { max-width:380px; margin:80px auto; text-align:center; background:#0a0a14; border:1px solid #2a2410; border-radius:16px; padding:30px 24px; }
+    .setup h1 { color:#ffcc00; text-shadow:0 0 12px rgba(255,204,0,0.5); font-size:20px; margin-bottom:20px; }
+    input { width:100%; padding:12px 14px; margin-bottom:12px; background:#111118; border:1px solid #333; color:#ffcc00; border-radius:10px; outline:none; font-size:14px; }
+    button { padding:10px 18px; background: linear-gradient(135deg,#ffcc00,#ff9900); border:none; color:#000; border-radius:10px; cursor:pointer; font-weight:bold; font-size:14px; }
+    .topbar { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #22222e; background:#0a0a14; position:sticky; top:0; }
+    .topbar h1 { font-size:16px; color:#ffcc00; }
+    .wrap { max-width: 1100px; margin:0 auto; padding:20px; }
+    .stats-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap:14px; margin-bottom:24px; }
+    .stat-card { background:#0a0a14; border:1px solid #22222e; border-radius:14px; padding:16px 18px; border-left:3px solid var(--ac,#ffcc00); }
+    .stat-card .label { font-size:11px; color:#889; text-transform:uppercase; margin-bottom:6px; }
+    .stat-card .value { font-size:24px; font-weight:bold; color:#ffcc00; }
+    .panel { background:#0a0a14; border:1px solid #22222e; border-radius:16px; margin-bottom:24px; overflow:hidden; }
+    .panel-head { display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #22222e; }
+    .panel-head h2 { font-size:15px; color:#ffcc00; }
+    .tabs { display:flex; gap:6px; }
+    .tab-btn { background:#111118; border:1px solid #333; color:#889; padding:6px 14px; border-radius:8px; font-size:12px; cursor:pointer; }
+    .tab-btn.active { background:rgba(255,204,0,0.1); border-color:#ffcc00; color:#ffcc00; }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    th { background:#0d1420; color:#ffcc00; text-align:left; padding:12px 16px; font-size:11px; text-transform:uppercase; }
+    td { padding:12px 16px; border-top:1px solid #16202e; color:#ccc; }
+    .badge { padding:3px 10px; border-radius:20px; font-size:11px; font-weight:bold; }
+    .badge.pending { background:rgba(255,235,59,0.15); color:#ffeb3b; }
+    .badge.approved { background:rgba(0,255,0,0.15); color:#0f0; }
+    .badge.rejected { background:rgba(255,85,85,0.15); color:#f55; }
+    .badge.suspicious { background:rgba(255,85,85,0.15); color:#f55; margin-left:6px; }
+    .action-btn { padding:5px 12px; font-size:11px; border-radius:8px; margin-right:6px; border:none; cursor:pointer; font-weight:bold; }
+    .action-btn.approve { background:rgba(0,255,0,0.15); color:#0f0; border:1px solid #0f0; }
+    .action-btn.reject { background:rgba(255,85,85,0.15); color:#f55; border:1px solid #f55; }
+    .empty-state { text-align:center; padding:40px; color:#556; }
+    .refresh-btn { background:#111118; border:1px solid #333; color:#ffcc00; padding:8px 14px; border-radius:8px; font-size:12px; cursor:pointer; }
+    .note { background:rgba(255,235,59,0.06); border-left:3px solid #ffeb3b; padding:10px 16px; margin:16px 20px; font-size:12px; color:#ffeb3b; border-radius:0 8px 8px 0; }
+</style>
+</head>
+<body>
+
+<div id="setup" class="setup">
+    <h1>⚙️ Admin Dashboard লগইন</h1>
+    <input id="apiUrl" placeholder="Backend URL" value="https://videobatty-server.onrender.com">
+    <input id="adminKey" type="password" placeholder="Admin Key (অথবা Support Key)">
+    <button style="width:100%;" onclick="startAdmin()">প্রবেশ করুন</button>
+</div>
+
+<div id="panel" style="display:none">
+    <div class="topbar">
+        <h1>🎬 ভিডিও বাত্তি — Admin Dashboard</h1>
+        <button class="refresh-btn" onclick="loadAll()">🔄 রিফ্রেশ</button>
+    </div>
+    <div class="wrap">
+        <div class="stats-grid" id="stats-grid"></div>
+        <div class="panel">
+            <div class="panel-head">
+                <h2>💰 উত্তোলন রিকোয়েস্ট</h2>
+                <div class="tabs">
+                    <button class="tab-btn active" data-f="all" onclick="setFilter('all')">সব</button>
+                    <button class="tab-btn" data-f="pending" onclick="setFilter('pending')">পেন্ডিং</button>
+                    <button class="tab-btn" data-f="approved" onclick="setFilter('approved')">অ্যাপ্রুভড</button>
+                    <button class="tab-btn" data-f="rejected" onclick="setFilter('rejected')">রিজেক্টেড</button>
+                </div>
+            </div>
+            <div class="note">✅ Approve করলে স্ট্যাটাস পরিবর্তন হবে; প্রকৃত টাকা bKash/Nagad থেকে ম্যানুয়ালি পাঠাতে হবে যদি অটো-পেআউট চালু না থাকে। ❌ Reject করলে কয়েন ফেরত যাবে।</div>
+            <div style="overflow-x:auto;"><table>
+                <thead><tr><th>সময়</th><th>ইউজার</th><th>ফোন</th><th>মাধ্যম</th><th>নাম্বার</th><th>টাকা</th><th>কয়েন</th><th>স্ট্যাটাস</th><th>একশন</th></tr></thead>
+                <tbody id="withdraw-rows"></tbody>
+            </table></div>
+        </div>
+        <div class="panel">
+            <div class="panel-head"><h2>👥 ইউজার তালিকা</h2></div>
+            <div style="overflow-x:auto;"><table>
+                <thead><tr><th>নাম</th><th>ফোন</th><th>কয়েন</th><th>অ্যাড দেখা</th><th>টাকা মূল্য</th><th>যোগদান</th><th>ফ্ল্যাগ</th><th>একশন</th></tr></thead>
+                <tbody id="user-rows"></tbody>
+            </table></div>
+        </div>
+    </div>
+</div>
+
+<script>
+let API = '', KEY = '', allWithdrawals = [], currentFilter = 'all';
+
+function startAdmin() {
+    API = document.getElementById('apiUrl').value.replace(/\/$/, '');
+    KEY = document.getElementById('adminKey').value;
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('panel').style.display = 'block';
+    loadAll();
+}
+async function apiGet(path) {
+    const res = await fetch(`${API}${path}`, { headers: { 'x-admin-key': KEY } });
+    if (!res.ok) throw new Error('অনুমতি নেই বা সার্ভার সমস্যা');
+    return res.json();
+}
+async function apiPost(path, body) {
+    const res = await fetch(`${API}${path}`, { method: 'POST', headers: { 'x-admin-key': KEY, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+    if (!res.ok) throw new Error((await res.json().catch(()=>({})) ).error || 'ব্যর্থ হয়েছে');
+    return res.json();
+}
+async function loadAll() {
+    try {
+        const [stats, wd, users] = await Promise.all([apiGet('/api/admin/stats'), apiGet('/api/admin/withdrawals'), apiGet('/api/admin/users')]);
+        renderStats(stats); allWithdrawals = wd.withdrawals; renderWithdrawals(); renderUsers(users.users);
+    } catch (e) { alert(e.message + ' — Admin Key বা URL চেক করুন'); }
+}
+function renderStats(s) {
+    document.getElementById('stats-grid').innerHTML = `
+        <div class="stat-card" style="--ac:#ffcc00"><div class="label">মোট ইউজার</div><div class="value">${s.totalUsers}</div></div>
+        <div class="stat-card" style="--ac:#0ff"><div class="label">মোট অ্যাড দেখা</div><div class="value">${s.totalAdsWatched}</div></div>
+        <div class="stat-card" style="--ac:#ffcc00"><div class="label">বকেয়া কয়েন</div><div class="value">${s.totalCoinsOutstanding}</div></div>
+        <div class="stat-card" style="--ac:#ffcc00"><div class="label">সম্ভাব্য দায় (৳)</div><div class="value">${s.totalTakaLiability}</div></div>
+        <div class="stat-card" style="--ac:#f55"><div class="label">পেন্ডিং উত্তোলন</div><div class="value">${s.pendingCount}</div></div>
+        <div class="stat-card" style="--ac:#f55"><div class="label">পেন্ডিং টাকা (৳)</div><div class="value">${s.pendingTaka}</div></div>
+        <div class="stat-card" style="--ac:#0f0"><div class="label">মোট পরিশোধিত (৳)</div><div class="value">${s.approvedTaka}</div></div>
+        <div class="stat-card" style="--ac:#f55"><div class="label">সন্দেহজনক একাউন্ট</div><div class="value">${s.suspiciousUsers}</div></div>`;
+}
+function setFilter(f) {
+    currentFilter = f;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.f === f));
+    renderWithdrawals();
+}
+function renderWithdrawals() {
+    const rows = document.getElementById('withdraw-rows');
+    const list = currentFilter === 'all' ? allWithdrawals : allWithdrawals.filter(w => w.status === currentFilter);
+    if (!list.length) { rows.innerHTML = `<tr><td colspan="9"><div class="empty-state">কোনো রিকোয়েস্ট নেই</div></td></tr>`; return; }
+    rows.innerHTML = list.map(w => `
+        <tr>
+            <td>${new Date(w.createdAt).toLocaleString('bn-BD')}</td><td>${w.userName}</td><td>${w.userPhone}</td>
+            <td>${w.method}</td><td>${w.number}</td><td>${w.amountTaka} ৳</td><td>${w.coinsUsed}</td>
+            <td><span class="badge ${w.status}">${w.status}</span></td>
+            <td>${w.status === 'pending' ? `<button class="action-btn approve" onclick="act('${w.id}','approve')">Approve</button><button class="action-btn reject" onclick="act('${w.id}','reject')">Reject</button>` : '-'}</td>
+        </tr>`).join('');
+}
+function renderUsers(users) {
+    const rows = document.getElementById('user-rows');
+    if (!users.length) { rows.innerHTML = `<tr><td colspan="8"><div class="empty-state">কোনো ইউজার নেই</div></td></tr>`; return; }
+    rows.innerHTML = users.slice().reverse().map(u => `
+        <tr>
+            <td>${u.name}</td><td>${u.phone}</td><td>${u.coins}</td><td>${u.adsWatched}</td><td>${u.takaValue} ৳</td>
+            <td>${new Date(u.createdAt).toLocaleDateString('bn-BD')}</td>
+            <td>${u.suspiciousMultiAccount ? '<span class="badge suspicious">⚠️ একাধিক?</span>' : '-'}</td>
+            <td><button class="action-btn approve" onclick="resetPassword('${u.phone}')">🔑 রিসেট</button></td>
+        </tr>`).join('');
+}
+async function act(id, action) {
+    if (!confirm(`নিশ্চিত করুন: ${action}?`)) return;
+    try { await apiPost(`/api/admin/withdrawals/${id}/${action}`); loadAll(); } catch (e) { alert(e.message); }
+}
+async function resetPassword(phone) {
+    const newPassword = prompt(`${phone} নাম্বারের ইউজারের নতুন পাসওয়ার্ড দিন (কমপক্ষে ৬ অক্ষর):`);
+    if (!newPassword) return;
+    try { await apiPost(`/api/admin/users/${encodeURIComponent(phone)}/reset-password`, { newPassword }); alert('পাসওয়ার্ড রিসেট হয়েছে।'); } catch (e) { alert(e.message); }
+}
+</script>
+</body>
+</html>
