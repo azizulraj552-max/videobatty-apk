@@ -1,7 +1,7 @@
 {
   "appId": "com.shikkhaghor.videobatty",
   "appName": "ভিডিও বাত্তি",
-  "webDir": "docs",
+  "webDir": "www",
   "bundledWebRuntime": false,
   "server": {
     "url": "https://videobatty.shikkhaghor.com",
